@@ -10,7 +10,9 @@ import Outlet from "./pages/Outlet";
 import Member from "./pages/Member";
 import Transaksi from "./pages/Transaksi";
 import Login from "./pages/Login";
-// import Detail_transaksi from "./pages/Detail_transaksi";
+import Detail from "./pages/Detail";
+import Invoice from "./components/element/invoice";
+// import TransaksiT from "./components/element/transaksi-test";
 import "./App.css";
 
 export default function App() {
@@ -24,7 +26,9 @@ export default function App() {
       <Route path="/outlet" element={<Outlet />} />
       <Route path="/member" element={<Member />} />
       <Route path="/transaksi" element={<Transaksi />} />
-      {/* <Route path="/detail_transaksi" element={<Detail_transaksi />} /> */}
+      <Route path="/detail" element={<Detail />} />
+      <Route path="/invoice" element={<Invoice />} />
+      {/* <Route path="/Transaksi-tes" element={<TransaksiT />} /> */}
     </Routes>
   );
 }

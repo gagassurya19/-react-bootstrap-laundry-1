@@ -8,7 +8,7 @@ import { Modal } from "bootstrap"; //modal yg dipake ini
 import Layout from "../../components/fragment/Layout";
 // inisiasi hit api
 import axios from "axios";
-import { baseUrl, member_image_url, url } from "../../config";
+import { baseUrl, member_image_url } from "../../config";
 
 export default class Member extends React.Component {
   constructor(props) {
@@ -16,13 +16,16 @@ export default class Member extends React.Component {
     this.state = {
       // variable yg dibutuhkan
       members: [],
-      id_member: "",
-      nama: "",
+      id_member: 0,
+      nama_member: "",
+      jenis_kelamin: "",
       alamat: "",
       telp: "",
 
       //utk auth
       token: "",
+      fillPassword: true,
+
       // utk image
       image: null,
       uploadFile: true,
@@ -43,11 +46,18 @@ export default class Member extends React.Component {
     axios
       .get(url)
       .then((response) => {
-        this.setState({ members: response.data.data });
-        console.log(response.data.data);
+        this.setState({ members: response.data });
+        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status) {
+            window.alert(error.response.data.message);
+            // this.props.history.push("/login");
+          }
+        } else {
+          console.log(error);
+        }
       });
     console.log(this.state.members);
   }
@@ -61,7 +71,7 @@ export default class Member extends React.Component {
     //Mengkosongkan input
     this.setState({
       id_member: 0,
-      nama: "",
+      nama_member: "",
       alamat: "",
       jenis_kelamin: "",
       telp: 0,
@@ -83,11 +93,11 @@ export default class Member extends React.Component {
 
     this.setState({
       id_member: this.state.members[index].id_member,
-      nama: this.state.members[index].nama,
+      nama_member: this.state.members[index].nama_member,
       alamat: this.state.members[index].alamat,
       jenis_kelamin: this.state.members[index].jenis_kelamin,
       telp: this.state.members[index].telp,
-      image: this.state.members[index].image,
+      image: null,
 
       // aksi uploadFile
       uploadFile: false,
@@ -107,7 +117,7 @@ export default class Member extends React.Component {
 
     this.setState({
       id_member: this.state.members[index].id_member,
-      nama: this.state.members[index].nama,
+      nama_member: this.state.members[index].nama_member,
       alamat: this.state.members[index].alamat,
       jenis_kelamin: this.state.members[index].jenis_kelamin,
       telp: this.state.members[index].telp,
@@ -116,20 +126,6 @@ export default class Member extends React.Component {
       action: "show",
     });
   }
-  // GET -> manggil data
-  // showData() {
-  //   let url = baseUrl + "/member";
-  //   axios
-  //     .get(url)
-  //     .then((response) => {
-  //       this.setState({ members: response.data.data });
-  //       console.log(response.data.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   console.log(this.state.members);
-  // }
 
   // function simpan data
   saveData(ev) {
@@ -137,17 +133,13 @@ export default class Member extends React.Component {
     // section untuk upload foto memakai formData
     let formData = new FormData(); // Currently empty
     formData.append("id_member", this.state.id_member);
-    formData.append("nama", this.state.nama);
+    formData.append("nama_member", this.state.nama_member);
     formData.append("alamat", this.state.alamat);
     formData.append("jenis_kelamin", this.state.jenis_kelamin);
     formData.append("telp", this.state.telp);
     if (this.state.uploadFile) {
       formData.append("image", this.state.image);
     }
-
-    // formData.forEach((value, key) => {
-    //   console.log("key %s: value %s", key, value);
-    // });
 
     //url endpoint
     let url = baseUrl + "/member";
@@ -159,7 +151,7 @@ export default class Member extends React.Component {
         .post(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getMembers();
         })
         .catch((error) => console.log(error));
@@ -169,7 +161,7 @@ export default class Member extends React.Component {
         .put(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getMembers();
         })
         .catch((error) => console.log(error));
@@ -183,14 +175,10 @@ export default class Member extends React.Component {
     //selecteditem utk show dan edit
     if (window.confirm("are you sure will delete this item?")) {
       let url = baseUrl + "/member/" + id_member;
-      // let data = {
-      //   id_member: id_member,
-      // };
-      // console.log(data);
       axios
         .delete(url)
         .then((response) => {
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getMembers();
         })
         .catch((error) => console.log(error));
@@ -218,7 +206,7 @@ export default class Member extends React.Component {
       <>
         <Layout>
           <div className="row">
-            <h1 className="col">ini MEMBER</h1>{" "}
+            <h1 className="col">List Customer ^_~</h1>{" "}
             <div className="col-3">
               <button className={`btn btn-success btn-sm mt-1 mx-2 `} onClick={() => this.addData()}>
                 Tambah data
@@ -242,7 +230,7 @@ export default class Member extends React.Component {
                 {this.state.members.map((member, index) => (
                   <tr key={index}>
                     <td>0{member.id_member}</td>
-                    <td>{member.nama}</td>
+                    <td>{member.nama_member}</td>
                     <td>{member.alamat}</td>
                     <td>{member.jenis_kelamin}</td>
                     <td>{member.telp}</td>
@@ -276,34 +264,21 @@ export default class Member extends React.Component {
                 <div className="modal-body">
                   <form>
                     <div class="text-center">
-                      {/* <img src={this.image} class="rounded"></img> */}
-                      <img src={url + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
-                      {console.log(url + this.state.image)}
-                      {/* <img src=`{${url}${user.image}}` className="rounded" alt="foto"></img> */}
-                      {/* http://localhost:4000/image//member//image-1647321877120.PNG */}
+                      <img src={member_image_url + "/" + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
                     </div>
                     {/* body form */}
                     ID Member
                     <input type="text" className="form-control mb-1" value={this.state.id_member} disabled />
                     Member Name
-                    <input type="text" className="form-control mb-1" value={this.state.nama} disabled />
-                    jenis_kelamin Name
-                    <input type="text" className="form-control mb-1" value={this.state.jenis_kelamin} disabled />
+                    <input type="text" className="form-control mb-1" value={this.state.nama_member} disabled />
                     Member alamat
                     <input type="text" className="form-control mb-1" value={this.state.alamat} disabled />
                     Member telp
+                    <input type="text" className="form-control mb-1" value={this.state.jenis_kelamin} disabled />
+                    jenis_kelamin
                     <input type="text" className="form-control mb-1" value={this.state.telp} disabled />
                   </form>
                 </div>
-                {/*  modal-footer */}
-                {/* <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
-                  </button>
-                  <button className={`btn btn-primary btn-sm mt-1 mx-2 `} onClick={() => this.updateData(this.state.id_member)}>
-                    edit
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -320,29 +295,27 @@ export default class Member extends React.Component {
                 <form onSubmit={(ev) => this.saveData(ev)}>
                   <div className="modal-body">
                     {/* UPLOAD IMAGE */}
-                    {/*  ADA REQUIRED */}
                     <div class="text-center">
-                      {/* {this.state.action === "update" && this.state.uploadFile === false ? (
+                      {this.state.action === "update" && this.state.uploadFile === false ? (
                         <button className="btn btn-sm btn-dark mb-1 btn-block" onClick={() => this.setState({ uploadFile: true })}>
-                          Change Member Image *required
+                          Change Member Image
                         </button>
-                      ) : ( */}
-                      <div>
-                        Member Image
-                        {/* <img id="frame" src={url + this.state.image} className="img-fluid"></img> */}
-                        <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
-                      </div>
-                      {/* )} */}
+                      ) : (
+                        <div>
+                          Member Image
+                          <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
+                        </div>
+                      )}
                     </div>
                     {/* body form */}
                     ID Member
                     <input type="text" className="form-control mb-1" value={this.state.id_member} onChange={(ev) => this.setState({ id_member: ev.target.value })} disabled />
                     Member Name
-                    <input type="text" className="form-control mb-1" value={this.state.nama} onChange={(ev) => this.setState({ nama: ev.target.value })} required />
+                    <input type="text" className="form-control mb-1" value={this.state.nama_member} onChange={(ev) => this.setState({ nama_member: ev.target.value })} required />
                     jenis_kelamin
-                    {/* <input type="text" className="form-control mb-1" value={this.state.nama} onChange={(ev) => this.setState({ nama: ev.target.value })} required /> */}
+                    {/* <input type="text" className="form-control mb-1" value={this.state.nama_member} onChange={(ev) => this.setState({ nama_member: ev.target.value })} required /> */}
                     <select class="form-select" aria-label="Default select example" value={this.state.jenis_kelamin} onChange={(ev) => this.setState({ jenis_kelamin: ev.target.value })} required>
-                      <option selected>jenis_kelamin</option>
+                      <option selected>--- Pilih ---</option>
                       <option value="P">Perempuan</option>
                       <option value="L">Laki laki</option>
                     </select>

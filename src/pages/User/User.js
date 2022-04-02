@@ -1,15 +1,13 @@
 // inisiasi library default
 import React from "react";
 import { Modal } from "bootstrap"; //modal yg dipake ini
-// import { event } from "jquery";
-// import { FaBeerIcon } from "@react-icons/all-files/fa/FaBeer";
 
 // inisiasi component
 import Layout from "../../components/fragment/Layout";
-// import Table from "../../components/fragment/Table";
+
 // inisiasi hit api
 import axios from "axios";
-import { baseUrl, user_image_url, url } from "../../config";
+import { baseUrl, user_image_url } from "../../config";
 
 export default class User extends React.Component {
   constructor(props) {
@@ -17,14 +15,15 @@ export default class User extends React.Component {
     this.state = {
       // call variable
       users: [],
-      id_user: "",
-      nama: "",
+      id_user: 0,
+      nama_user: "",
       username: "",
       password: "",
       role: "",
 
       //utk auth
       token: "",
+      fillPassword: true,
       // utk image
       image: null,
       uploadFile: true,
@@ -45,11 +44,18 @@ export default class User extends React.Component {
     axios
       .get(url)
       .then((response) => {
-        this.setState({ users: response.data.data });
-        console.log(response.data.data);
+        this.setState({ users: response.data });
+        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status) {
+            window.alert(error.response.data.message);
+            // this.props.history.push("/login");
+          }
+        } else {
+          console.log(error);
+        }
       });
     console.log(this.state.users);
   }
@@ -63,7 +69,7 @@ export default class User extends React.Component {
     //Mengosongkan input
     this.setState({
       id_user: 0,
-      nama: "",
+      nama_user: "",
       username: "",
       password: "",
       role: "",
@@ -76,6 +82,7 @@ export default class User extends React.Component {
 
   // function ubah data
   updateData(selecteditem) {
+    // menampilkan modal versi bootstrap 5
     //Memunculkan Modal
     this.modalUser = new Modal(document.getElementById("edit-modal"));
     this.modalUser.show();
@@ -85,11 +92,11 @@ export default class User extends React.Component {
 
     this.setState({
       id_user: this.state.users[index].id_user,
-      nama: this.state.users[index].nama,
+      nama_user: this.state.users[index].nama_user,
       username: this.state.users[index].username,
       password: this.state.users[index].password,
       role: this.state.users[index].role,
-      image: this.state.users[index].image,
+      image: null,
 
       // aksi uploadFile
       uploadFile: false,
@@ -109,7 +116,7 @@ export default class User extends React.Component {
 
     this.setState({
       id_user: this.state.users[index].id_user,
-      nama: this.state.users[index].nama,
+      nama_user: this.state.users[index].nama_user,
       username: this.state.users[index].username,
       password: this.state.users[index].password,
       role: this.state.users[index].role,
@@ -126,7 +133,7 @@ export default class User extends React.Component {
     // section untuk upload foto memakai formData
     let formData = new FormData(); // Currently empty
     formData.append("id_user", this.state.id_user);
-    formData.append("nama", this.state.nama);
+    formData.append("nama_user", this.state.nama_user);
     formData.append("username", this.state.username);
     formData.append("password", this.state.password);
     formData.append("role", this.state.role);
@@ -148,7 +155,7 @@ export default class User extends React.Component {
         .post(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getUsers();
         })
         .catch((error) => console.log(error));
@@ -158,7 +165,7 @@ export default class User extends React.Component {
         .put(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getUsers();
         })
         .catch((error) => console.log(error));
@@ -172,14 +179,10 @@ export default class User extends React.Component {
     //selecteditem utk show dan edit
     if (window.confirm("are you sure will delete this item?")) {
       let url = baseUrl + "/user/" + id_user;
-      // let data = {
-      //   id_user: id_user,
-      // };
-      // console.log(data);
       axios
         .delete(url)
         .then((response) => {
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getUsers();
         })
         .catch((error) => console.log(error));
@@ -206,7 +209,7 @@ export default class User extends React.Component {
       <>
         <Layout>
           <div className="row">
-            <h1 className="col">ini USER</h1>{" "}
+            <h1 className="col">List Karyawan ^-^</h1>{" "}
             <div className="col-3">
               <button className={`btn btn-success btn-sm mt-1 mx-2 `} onClick={() => this.addData()}>
                 Tambah data
@@ -230,7 +233,7 @@ export default class User extends React.Component {
                 {this.state.users.map((user, index) => (
                   <tr key={index}>
                     <td>0{user.id_user}</td>
-                    <td>{user.nama}</td>
+                    <td>{user.nama_user}</td>
                     <td>{user.username}</td>
                     <td>{user.password}</td>
                     <td>
@@ -266,17 +269,13 @@ export default class User extends React.Component {
                 <div className="modal-body">
                   <form>
                     <div class="text-center">
-                      {/* <img src={this.image} class="rounded"></img> */}
-                      <img src={url + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
-                      {console.log(url + this.state.image)}
-                      {/* <img src=`{${url}${user.image}}` className="rounded" alt="foto"></img> */}
-                      {/* http://localhost:4000/image//member//image-1647321877120.PNG */}
+                      <img src={user_image_url + "/" + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
                     </div>
                     {/* body form */}
                     ID User
                     <input type="text" className="form-control mb-1" value={this.state.id_user} disabled />
                     User Name
-                    <input type="text" className="form-control mb-1" value={this.state.nama} disabled />
+                    <input type="text" className="form-control mb-1" value={this.state.nama_user} disabled />
                     Username
                     <input type="text" className="form-control mb-1" value={this.state.username} disabled />
                     Password
@@ -285,15 +284,6 @@ export default class User extends React.Component {
                     <input type="text" className="form-control mb-1" value={this.state.role} disabled />
                   </form>
                 </div>
-                {/*  modal-footer */}
-                {/* <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
-                  </button>
-                  <button className={`btn btn-primary btn-sm mt-1 mx-2 `} onClick={() => this.updateData(this.state.id_member)}>
-                    edit
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -310,35 +300,33 @@ export default class User extends React.Component {
                 <form onSubmit={(ev) => this.saveData(ev)}>
                   <div className="modal-body">
                     {/* UPLOAD IMAGE */}
-                    {/*  ADA REQUIRED */}
                     <div class="text-center">
-                      {/* {this.state.action === "update" && this.state.uploadFile === false ? (
+                      {this.state.action === "update" && this.state.uploadFile === false ? (
                         <button className="btn btn-sm btn-dark mb-1 btn-block" onClick={() => this.setState({ uploadFile: true })}>
-                          Change Member Image *required
+                          Change User Image
                         </button>
-                      ) : ( */}
-                      <div>
-                        User Image
-                        {/* <img id="frame" src={url + this.state.image} className="img-fluid"></img> */}
-                        <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
-                      </div>
-                      {/* )} */}
+                      ) : (
+                        <div>
+                          User Image
+                          <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
+                        </div>
+                      )}
                     </div>
                     {/* body form */}
                     ID User
                     <input type="text" className="form-control mb-1" value={this.state.id_user} onChange={(ev) => this.setState({ id_user: ev.target.value })} disabled />
                     Member Name
-                    <input type="text" className="form-control mb-1" value={this.state.nama} onChange={(ev) => this.setState({ nama: ev.target.value })} required />
+                    <input type="text" className="form-control mb-1" value={this.state.nama_user} onChange={(ev) => this.setState({ nama_user: ev.target.value })} required />
                     Username Name
                     <input type="text" className="form-control mb-1" value={this.state.username} onChange={(ev) => this.setState({ username: ev.target.value })} required />
                     Password
                     <input type="text" className="form-control mb-1" value={this.state.password} onChange={(ev) => this.setState({ password: ev.target.value })} required />
                     Role
-                    {/* <input type="text" className="form-control mb-1" value={this.state.nama} onChange={(ev) => this.setState({ nama: ev.target.value })} required /> */}
+                    {/* <input type="text" className="form-control mb-1" value={this.state.nama_user} onChange={(ev) => this.setState({ nama: ev.target.value })} required /> */}
                     <select class="form-select" aria-label="Default select example" value={this.state.role} onChange={(ev) => this.setState({ role: ev.target.value })} required>
-                      <option selected>Open this select menu</option>
+                      <option selected>--- Pilih ---</option>
                       <option value="admin">Admin</option>
-                      <option value="Kasir">Kasir</option>
+                      <option value="kasir">Kasir</option>
                       <option value="owner">Owner</option>
                     </select>
                   </div>

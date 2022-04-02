@@ -1,5 +1,8 @@
-const baseUrl = "http://localhost:4000/api";
-const url = `http://localhost:4000/`;
-const user_image_url = "http://localhost:4000/api/image/user";
-const member_image_url = "http://localhost:4000/image//member//";
-export { baseUrl, user_image_url, member_image_url, url };
+const baseUrl = "http://localhost:8000/laundry/api";
+const url = `http://localhost:8000/`;
+const user_image_url = "http://localhost:8000/image/user";
+const member_image_url = "http://localhost:8000/image/member";
+const outlet_image_url = "http://localhost:8000/image/outlet";
+const detail_image_url = "http://localhost:8000/image/detail";
+
+export { baseUrl, url, user_image_url, member_image_url, outlet_image_url, detail_image_url };

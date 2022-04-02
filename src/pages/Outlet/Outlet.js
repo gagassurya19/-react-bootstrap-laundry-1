@@ -4,19 +4,18 @@ import { Modal } from "bootstrap"; //modal yg dipake ini
 
 // inisiasi component
 import Layout from "../../components/fragment/Layout";
-import Card from "../../components/element/Card";
 
 // inisiasi hit api
 import axios from "axios";
-import { baseUrl, member_image_url, url } from "../../config";
+import { baseUrl, outlet_image_url } from "../../config";
 export default class Outlet extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       // variable yg dibutuhkan
       outlets: [],
-      id_outlet: "",
-      tempat: "",
+      id_outlet: 0,
+      domisili_outlet: "",
 
       //utk auth
       token: "",
@@ -40,11 +39,18 @@ export default class Outlet extends React.Component {
     axios
       .get(url)
       .then((response) => {
-        this.setState({ outlets: response.data.data });
-        console.log(response.data.data);
+        this.setState({ outlets: response.data });
+        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response) {
+          if (error.response.status) {
+            window.alert(error.response.data.message);
+            // this.props.history.push("/login");
+          }
+        } else {
+          console.log(error);
+        }
       });
     console.log(this.state.outlets);
   }
@@ -57,8 +63,8 @@ export default class Outlet extends React.Component {
 
     //Mengkosongkan input
     this.setState({
-      id_oulet: 0,
-      tempat: "",
+      id_outlet: 0,
+      domisili_outlet: "",
       image: null,
 
       uploadFile: true, // aksi upload file
@@ -73,11 +79,11 @@ export default class Outlet extends React.Component {
     this.modalOutlet.show();
 
     //mencari posisi index dari data member berdasarkan id_user pada array members
-    let index = this.state.outlets.findIndex((outlet) => outlet.id_oulet === selecteditem);
+    let index = this.state.outlets.findIndex((outlet) => outlet.id_outlet === selecteditem);
 
     this.setState({
       id_outlet: this.state.outlets[index].id_outlet,
-      tempat: this.state.outlets[index].tempat,
+      domisili_outlet: this.state.outlets[index].domisili_outlet,
       image: this.state.outlets[index].image,
 
       // aksi uploadFile
@@ -98,7 +104,7 @@ export default class Outlet extends React.Component {
 
     this.setState({
       id_outlet: this.state.outlets[index].id_outlet,
-      tempat: this.state.outlets[index].tempat,
+      domisili_outlet: this.state.outlets[index].domisili_outlet,
       image: this.state.outlets[index].image,
 
       action: "show",
@@ -111,15 +117,10 @@ export default class Outlet extends React.Component {
     // section untuk upload foto memakai formData
     let formData = new FormData(); // Currently empty
     formData.append("id_outlet", this.state.id_outlet);
-    formData.append("tempat", this.state.tempat);
+    formData.append("domisili_outlet", this.state.domisili_outlet);
     if (this.state.uploadFile) {
       formData.append("image", this.state.image);
     }
-
-    // formData.forEach((value, key) => {
-    //   console.log("key %s: value %s", key, value);
-    // });
-
     //url endpoint
     let url = baseUrl + "/outlet";
 
@@ -130,7 +131,7 @@ export default class Outlet extends React.Component {
         .post(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getOutlets();
         })
         .catch((error) => console.log(error));
@@ -140,7 +141,7 @@ export default class Outlet extends React.Component {
         .put(url, formData)
         .then((response) => {
           // keluarkan respon
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getOutlets();
         })
         .catch((error) => console.log(error));
@@ -153,14 +154,10 @@ export default class Outlet extends React.Component {
     //selecteditem utk show dan edit
     if (window.confirm("are you sure will delete this item?")) {
       let url = baseUrl + "/outlet/" + id_outlet;
-      // let data = {
-      //   id_member: id_member,
-      // };
-      // console.log(data);
       axios
         .delete(url)
         .then((response) => {
-          // window.alert(response.data.message);
+          window.alert(response.data.message);
           this.getOutlets();
         })
         .catch((error) => console.log(error));
@@ -177,39 +174,13 @@ export default class Outlet extends React.Component {
       <>
         <Layout>
           <div className="row">
-            <h1 className="col">ini OUTLET</h1>{" "}
+            <h1 className="col">List Outlet ^3^</h1>{" "}
             <div className="col-3">
               <button className={`btn btn-success btn-sm mt-1 mx-2 `} onClick={() => this.addData()}>
                 Tambah data
               </button>
             </div>
           </div>
-
-          {/* CARD 2 */}
-          {/* <div className="col-lg 4 col-md-6 col-sm-12 mt-2">
-            {this.state.outlets.map((outlet, index) => (
-              <div className="card" key={index}>
-                <img src={outlet.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
-
-                <div className="card-body">
-                  <h5 className="card-title">{outlet.tempat}</h5>
-                  <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-                  <div className="row">
-                    <button className={`btn btn-success btn-sm mt-1 mx-2 `} onClick={() => this.showData(outlet.id_outlet)}>
-                      show
-                    </button>
-                    <button className={`btn btn-primary btn-sm mt-1 mx-2 `} onClick={() => this.updateData(outlet.id_outlet)}>
-                      edit
-                    </button>
-                    <button className={`btn btn-danger btn-sm mt-1 mx-2 `} onClick={() => this.dropData(outlet.id_outlet)}>
-                      delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div> */}
 
           {/* TABLE */}
           <div className="col-12 card shadow p-4 rounded-3 border-0">
@@ -218,17 +189,20 @@ export default class Outlet extends React.Component {
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Gambar</th>
-                  <th scope="col">Name Tempat</th>
+                  <th scope="col">Name domisili_outlet</th>
+                  <th scope="col">Transaksi</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {this.state.outlets.map((outlet, index) => (
                   <tr key={index}>
-                    <td>0{outlet.id_oulet}</td>
-                    {/* <td>{outlet.image}</td> */}
-                    <td>{url + "/" + outlet.image}</td>
-                    <td>{outlet.tempat}</td>
+                    <td>0{outlet.id_outlet}</td>
+                    {/* <td>0{outlet.id_member}</td> */}
+                    {/* <td>0{outlet.id_user}</td> */}
+                    <td>{outlet.image}</td>
+                    <td>{outlet.domisili_outlet}</td>
+                    <td>12 transaksi</td>
                     <td>
                       <button className={`btn btn-success btn-sm mt-1 mx-2 `} onClick={() => this.showData(outlet.id_outlet)}>
                         show
@@ -260,26 +234,15 @@ export default class Outlet extends React.Component {
                 <div className="modal-body">
                   <form>
                     <div class="text-center">
-                      {/* <img src={this.image} class="rounded"></img> */}
-                      <img src={url + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
-                      {console.log(url + this.state.image)}
+                      <img src={outlet_image_url + "/" + this.state.image} class="rounded" alt="gambar" height="100%" width="50%"></img>
                     </div>
                     {/* body form */}
                     ID outlet
                     <input type="text" className="form-control mb-1" value={this.state.id_outlet} disabled />
-                    Tempat Outlet
-                    <input type="text" className="form-control mb-1" value={this.state.tempat} disabled />
+                    domisili_outlet
+                    <input type="text" className="form-control mb-1" value={this.state.domisili_outlet} disabled />
                   </form>
                 </div>
-                {/*  modal-footer */}
-                {/* <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
-                  </button>
-                  <button className={`btn btn-primary btn-sm mt-1 mx-2 `} onClick={() => this.updateData(this.state.id_member)}>
-                    edit
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -297,17 +260,22 @@ export default class Outlet extends React.Component {
                   <div className="modal-body">
                     {/* UPLOAD IMAGE */}
                     <div class="text-center">
-                      <div>
-                        Member Image
-                        <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
-                      </div>
-                      {/* )} */}
+                      {this.state.action === "update" && this.state.uploadFile === false ? (
+                        <button className="btn btn-sm btn-dark mb-1 btn-block" onClick={() => this.setState({ uploadFile: true })}>
+                          Change Outlet Image
+                        </button>
+                      ) : (
+                        <div>
+                          Outlet Image
+                          <input type="file" className="form-control mb-1" onChange={(ev) => this.setState({ image: ev.target.files[0] })} required />
+                        </div>
+                      )}
                     </div>
                     {/* body form */}
                     ID OUTLET
                     <input type="text" className="form-control mb-1" value={this.state.id_outlet} onChange={(ev) => this.setState({ id_outlet: ev.target.value })} disabled />
-                    Tempat Name
-                    <input type="text" className="form-control mb-1" value={this.state.tempat} onChange={(ev) => this.setState({ tempat: ev.target.value })} required />
+                    domisili_outlet
+                    <input type="text" className="form-control mb-1" value={this.state.domisili_outlet} onChange={(ev) => this.setState({ domisili_outlet: ev.target.value })} required />
                   </div>
                   {/* modal-footer */}
                   <div class="modal-footer">

@@ -1,58 +1,87 @@
-// inisiasi library default
 import React from "react";
+// import Navbar from "../component/Navbar"
 
-// inisiasi component
+// import axios
+import axios from "axios";
+
+// import base_url dari file config.js
+import { baseUrl } from "../../config";
 
 export default class Login extends React.Component {
   constructor() {
     super();
+    // tambah state sesuai kebutuhan
     this.state = {
-      // call variable
+      username: "",
+      password: "",
+      message: "",
+      logged: true,
     };
   }
+
+  // arrow function -> untuk menjalankan fungsi login
+  Login = (event) => {
+    event.preventDefault();
+    let sendData = {
+      username: this.state.username,
+      password: this.state.password,
+    };
+
+    let url = baseUrl + "/auth";
+
+    axios
+      .post(url, sendData)
+      .then((res) => {
+        this.setState({ logged: res.data.logged });
+        if (this.state.logged) {
+          let user = res.data.data;
+          let token = res.data.token;
+          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("token", token);
+          this.props.history.push("/");
+        } else {
+          this.setState({ message: res.data.message });
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
   render() {
     return (
-      <div className="container mt-5 align-center">
-        <div class="card bg-warning">
-          <h1 class="h3 mb-3 fw-normal text-center">ini LOGIN</h1>
-
-          <form>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">
-                Email address
-              </label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"></input>
-              <div id="emailHelp" class="form-text">
-                We'll never share your email with anyone else.
+      <div className="container d-flex h-100 justify-content-center align-items-center">
+        <div className="col-sm-8 card my-5">
+          <div className="card-header bg-primary text-white text-center">
+            <h4>Laundry</h4>
+            <strong className="text-warning">Admin Sign In</strong>
+          </div>
+          <div className="card-body">
+            {!this.state.logged ? <div className="alert alert-danger mt-1">{this.state.message}</div> : null}
+            <form onSubmit={(ev) => this.Login(ev)}>
+              {/* username */}
+              <div className="form-group row">
+                <label className="col-sm-2 col-form-label">Username</label>
+                <div className="col-sm-10">
+                  <input type="text" className="form-control mb-1" value={this.state.username} onChange={(ev) => this.setState({ username: ev.target.value })} />
+                </div>
               </div>
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">
-                Password
-              </label>
-              <input type="password" class="form-control" id="exampleInputPassword1"></input>
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">
-                Role
-              </label>
-              <select class="form-select" aria-label="Default select example">
-                <option selected>Select Your Role</option>
-                <option value="admin">Admin</option>
-                <option value="kasir">Kasir</option>
-                <option value="owner">Owner</option>
-              </select>
-            </div>
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="exampleCheck1"></input>
-              <label class="form-check-label" for="exampleCheck1">
-                Check me out
-              </label>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Submit
-            </button>
-          </form>
+
+              {/* password */}
+              <div className="form-group row">
+                <label className="col-sm-2 col-form-label">Password</label>
+                <div className="col-sm-10">
+                  <input type="password" className="form-control mb-1" value={this.state.password} onChange={(ev) => this.setState({ password: ev.target.value })} utoComplete="false" />
+                </div>
+              </div>
+
+              <button className="btn btn-block btn-primary mb-1" type="submit">
+                Sign In
+              </button>
+
+              <a href="" className="small justify-right">
+                Daftar Akun
+              </a>
+            </form>
+          </div>
         </div>
       </div>
     );

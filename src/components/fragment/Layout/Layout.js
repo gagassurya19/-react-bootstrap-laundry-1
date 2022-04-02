@@ -31,12 +31,20 @@ export default function Layout({ children }) {
       target: "/transaksi",
     },
     {
+      label: "Detail Transaksi",
+      target: "/detail",
+    },
+    {
       label: "Login",
       target: "/login",
     },
+    {
+      label: "Invoice",
+      target: "/invoice",
+    },
     // {
-    //   label: "Detail Transaksi",
-    //   target: "/detail_transaksi",
+    //   label: "Transaksi tes",
+    //   target: "/transaksi-tes",
     // },
   ];
 
