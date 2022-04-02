@@ -57,17 +57,17 @@ export class Invoice extends Component {
 
   getPDF = (ev) => {
     ev.preventDefault();
-    var HTML_Width = $("article").width();
-    var HTML_Height = $("article").height();
+    var HTML_Width = $("#printThisOut").width();
+    var HTML_Height = $("#printThisOut").height();
     var top_left_margin = 15;
     var PDF_Width = HTML_Width + top_left_margin * 2;
     var PDF_Height = PDF_Width * 1.5 + top_left_margin * 2;
     var canvas_image_width = HTML_Width;
     var canvas_image_height = HTML_Height;
     var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
-    const fromState = this.state.invoice;
+    const fromState = "ini code invoicenya";
 
-    html2canvas($("article")[0], { allowTaint: true }).then(function (canvas) {
+    html2canvas($("#printThisOut")[0], { allowTaint: true }).then(function (canvas) {
       canvas.getContext("2d");
       var imgData = canvas.toDataURL("image/jpeg", 1.0);
       var pdf = new jsPDF("p", "pt", [PDF_Width, PDF_Height]);
@@ -87,167 +87,137 @@ export class Invoice extends Component {
 
   render() {
     return (
-      <section class="bg-gray-100">
-        <div className="container mx-auto">
-          <div class=" mx-auto py-10 md:py-16">
-            <h1 class="title-font sm:text-3xl text-2xl mb-1 font-medium text-gray-900">Order Success</h1>
-            <p class="mb-11 leading-relaxed text-gray-500">This is your invoices {this.state.invoice}</p>
-            <article class="shadow-none md:shadow-md md:rounded-md overflow-hidden">
-              <div class="md:rounded-b-md  bg-white">
-                <div class="p-9 border-b border-gray-200">
-                  <div class="space-y-6">
-                    <div class="flex justify-between items-top">
-                      <div class="space-y-4">
-                        <div>
-                          <div className="mb-5 flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                            <div className="flex-shrink-0 flex items-center title-font font-medium text-gray-900">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                class="hidden lg:block h-10 w-auto text-white p-2 bg-indigo-500 rounded-full"
-                                viewBox="0 0 24 24"
-                              >
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                              </svg>
-                              <Link to="/">
-                                <span class="ml-3 text-xl hidden sm:block">Laundryku</span>
-                              </Link>
-                            </div>
-                          </div>
-                          <p class="font-bold text-lg"> Invoice </p>
-                          <p class="font-medium text-sm text-gray-400"> Outlet Branch </p>
-                          <p> {this.state.header.outlet_name} </p>
-                        </div>
-                        <div>
-                          <p class="font-medium text-sm text-gray-400"> Billed To </p>
-                          <p> {this.state.header.customer_name} </p>
-                          <p> {this.state.header.customer_email} </p>
-                          <p> {this.state.header.customer_phone} </p>
-                        </div>
-                      </div>
-                      <div class="space-y-2">
-                        <div>
-                          <p class="font-medium text-sm text-gray-400"> Invoice Number </p>
-                          <p> {this.state.invoice} </p>
-                        </div>
-                        <div>
-                          <p class="font-medium text-sm text-gray-400"> Invoice Date </p>
-                          <p> {this.state.header.invoice_date} </p>
-                        </div>
-                        <div>
-                          <a href="#generate-invoice-pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-500 hover:opacity-75 " onClick={(ev) => this.getPDF(ev)}>
-                            {" "}
-                            Download PDF{" "}
-                            <svg class="ml-0.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                            </svg>
-                          </a>
-                        </div>
-                      </div>
+      <div class="container">
+        <div class="jumbotron d-flex align-items-center min-vh-100">
+          <div class="container text-center">
+            <div id='printThisOut' class="card">
+              <div class="card-header">
+                <span className="float-start">
+                  Invoice
+                  <strong>01/01/01/2018</strong> 
+                </span>
+                <span class="float-end">
+                  <strong>Status:</strong> Pending
+                  <button type="button" class="btn btn-primary btn-sm ms-3" onClick={ev => this.getPDF(ev)}>Cetak Invoice</button>
+                </span>
+              </div>
+              <div class="card-body">
+                <div class="row mb-4">
+                  <div class="col-sm-6">
+                    <h6 class="mb-3">From:</h6>
+                    <div>
+                      <strong>Webz Poland</strong>
                     </div>
+                    <div>Madalinskiego 8</div>
+                    <div>71-101 Szczecin, Poland</div>
+                    <div>Email: info@webz.com.pl</div>
+                    <div>Phone: +48 444 666 3333</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <h6 class="mb-3">To:</h6>
+                    <div>
+                      <strong>Bob Mart</strong>
+                    </div>
+                    <div>Attn: Daniel Marek</div>
+                    <div>43-190 Mikolow, Poland</div>
+                    <div>Email: marek@daniel.com</div>
+                    <div>Phone: +48 123 456 789</div>
                   </div>
                 </div>
-                <div class="p-9 border-b border-gray-200 p-y-2">
-                  <div>
-                    <p class="font-medium text-sm text-gray-400"> Laundry Note </p>
-                    <p class="text-sm"> {this.state.body.laundry_notes} </p>
-                  </div>
-                  <div className="mt-3">
-                    <p class="font-medium text-sm text-gray-400"> Driver Note </p>
-                    <p class="text-sm"> {this.state.body.driver_notes} </p>
-                  </div>
-                </div>
-                <table class="w-full divide-y divide-gray-200 text-sm">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="px-9 py-4 text-left font-semibold text-gray-400">
-                        {" "}
-                        Item{" "}
-                      </th>
-                      <th scope="col" class="py-3 text-left font-semibold text-gray-400">
-                        {" "}
-                      </th>
-                      <th scope="col" class="py-3 text-left font-semibold text-gray-400">
-                        {" "}
-                        Status{" "}
-                      </th>
-                      <th scope="col" class="py-3 text-left font-semibold text-gray-400">
-                        {" "}
-                        Dates{" "}
-                      </th>
-                      <th scope="col" class="py-3 text-left font-semibold text-gray-400">
-                        {" "}
-                        Amount{" "}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    {this.state.body.items.map((data, index) => (
+                <div class="table-responsive-sm">
+                  <table class="table table-striped">
+                    <thead>
                       <tr>
-                        <td class="px-9 py-5 whitespace-nowrap space-x-1 flex items-center">
-                          <div>
-                            <p> {data.item_name} </p>
-                            <p class="text-sm text-gray-400"> ID: {data.id} </p>
-                          </div>
-                        </td>
-                        <td class="whitespace-nowrap text-gray-600 truncate"> </td>
-                        <td class="whitespace-nowrap text-gray-600 truncate">
-                          <span class="bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">Diproses</span>
-                        </td>
-                        <td class="whitespace-nowrap space-x-1 flex items-center">
-                          <div>
-                            <p> Pickup: {data.pickup_date} </p>
-                            <p class="text-sm text-gray-400"> Dropoff: {data.drop_date} </p>
-                          </div>
-                        </td>
-                        <td class="whitespace-nowrap text-gray-600 truncate"> Rp{data.item_price} </td>
+                        <th class="center">#</th>
+                        <th>Item</th>
+                        <th>Description</th>
+
+                        <th class="right">Unit Cost</th>
+                        <th class="center">Qty</th>
+                        <th class="right">Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div class="border-b border-gray-200">
-                  {/* <div class="space-y-3">
-                                        <div class="flex justify-between">
-                                            <div>
-                                                <p class="text-gray-500 text-sm"> Subtotal </p>
-                                            </div>
-                                            <p class="text-gray-500 text-sm"> $660,000.00 </p>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <div>
-                                                <p class="text-gray-500 text-sm"> Tax </p>
-                                            </div>
-                                            <p class="text-gray-500 text-sm"> $0.00 </p>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <div>
-                                                <p class="text-gray-500 text-sm"> Total </p>
-                                            </div>
-                                            <p class="text-gray-500 text-sm"> $660,000.00 </p>
-                                        </div>
-                                    </div> */}
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="center">1</td>
+                        <td class="left strong">Origin License</td>
+                        <td class="left">Extended License</td>
+
+                        <td class="right">$999,00</td>
+                        <td class="center">1</td>
+                        <td class="right">$999,00</td>
+                      </tr>
+                      <tr>
+                        <td class="center">2</td>
+                        <td class="left">Custom Services</td>
+                        <td class="left">Instalation and Customization (cost per hour)</td>
+
+                        <td class="right">$150,00</td>
+                        <td class="center">20</td>
+                        <td class="right">$3.000,00</td>
+                      </tr>
+                      <tr>
+                        <td class="center">3</td>
+                        <td class="left">Hosting</td>
+                        <td class="left">1 year subcription</td>
+
+                        <td class="right">$499,00</td>
+                        <td class="center">1</td>
+                        <td class="right">$499,00</td>
+                      </tr>
+                      <tr>
+                        <td class="center">4</td>
+                        <td class="left">Platinum Support</td>
+                        <td class="left">1 year subcription 24/7</td>
+
+                        <td class="right">$3.999,00</td>
+                        <td class="center">1</td>
+                        <td class="right">$3.999,00</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div class="p-9 border-b border-gray-200">
-                  <div class="space-y-3">
-                    <div class="flex justify-between">
-                      <div>
-                        <p class="font-bold text-black text-lg"> Total </p>
-                      </div>
-                      <p class="font-bold text-black text-lg"> Rp{this.state.body.total_price},00 </p>
-                    </div>
+                <div class="row">
+                  <div class="col-lg-4 col-sm-5">
+                  </div>
+                  <div class="col-lg-4 col-sm-5 ml-auto">
+                    <table class="table table-clear">
+                      <tbody>
+                        <tr>
+                          <td class="left">
+                            <strong>Subtotal</strong>
+                          </td>
+                          <td class="right">$8.497,00</td>
+                        </tr>
+                        <tr>
+                          <td class="left">
+                            <strong>Discount (20%)</strong>
+                          </td>
+                          <td class="right">$1,699,40</td>
+                        </tr>
+                        <tr>
+                          <td class="left">
+                            <strong>VAT (10%)</strong>
+                          </td>
+                          <td class="right">$679,76</td>
+                        </tr>
+                        <tr>
+                          <td class="left">
+                            <strong>Total</strong>
+                          </td>
+                          <td class="right">
+                            <strong>$7.477,36</strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-            </article>
+            </div>
           </div>
-          {/* <Footer /> */}
         </div>
-      </section>
+      </div>
     );
   }
 }
